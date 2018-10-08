@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<!-- Paul Barrett -->
+<!-- example/starter code -->
+<!-- also look at:
+https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_table_insertrow
+Game piece images:
+http://pluspng.com/png-game-piece-9524.html
+-->
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8"/>
+		<style>
+			table {
+				font-family: arial, sans-serif;
+				border: 1px solid black
+				border-collapse: collapse;
+				width:60%;
+				table-layout: fixed;
+			}
+
+			td, th {
+				border: 2px solid #dddddd;
+				text-align: center;
+				padding: 6px;
+			}
+		</style>
+	</head>
+
+	<body>
+	<h1> Ships and Lightyears </h1>
+	<h3> Paul Barrett </h3>
+
+	<!-- remember: example code! -->
+	<p>
+	How to play:<br>
+	The objective of this game is to race Nonkio to the finish. <br>
+	There are 20 spaces to reach the end, you will roll the dice to see how far you go each turn. <br>
+	Move both of your ships to the finish line before Nonkio does!
+	</p>
+	<table id="control">
+		<tr>
+			<td id="start"><button onclick="makeTable()">Restart</td>
+			<td id="move"><button onclick="moveShip()">Move</td>
+		</tr>
+	</table>
+	<h4>Game Alerts: </h4>
+	<p id=gamemsg></p>
+	<p id=nonkiogamemsg></p>
+	<p id=fingamemsg></p>
+
+	<!-- Note this is one table, you'll want TWO, one for each path -->
+	<table id="trouble"></table>
+
+	<script>
+		var theBoard = document.getElementById("trouble");
+		gamemsg = document.getElementById("gamemsg");
+		nonkiomsg = document.getElementById("nonkiogamemsg");
+		finmsg = document.getElementById("fingamemsg");
+		//keep track of where each game piece is at by id
+		var positions = [1, 23, 45, 67];
+		var gamefinished = false;
+		//stop user from making a bunch of tables
+		var startToggle = true;
+
+		//make the board and restart
+		function makeTable(){
+			if(startToggle == true){
+				gamemsg.innerHTML = "Press move button and select which friendly ship you would like to move"
+				+ "<br />" + "Choose FS Ship or FP Ship";
+				for(i = 0; i < 22; i++){
+					insertSpot();
+				}
+			} else {
+				gamemsg.innerHTML = "You must finish the current game before restarting!";
+			}
+			startToggle = false;
+			if (gamefinished == true){
+				location.reload();
+			}
+		}
+
+		makeTable();
+
+		//determine who has won the game
+		function finished(){
+			//finish spots are [21, 43, 65, 87]
+			if(positions[0] == 21 && positions[1] == 43){
+				window.alert("You won!\nPress Restart to play again.");
+				gamefinished = true;
+			} else if (positions[2] == 65 && positions[3] == 87) {
+				window.alert("You lost!\nPress Restart to try again.");
+				gamefinished = true;
+			}
+		}
+
+		//generate number 1-6 for dice roll
+		function rollDice(begin, end){
+			return Math.floor(Math.random() * (end - begin + 1)) + begin;
+		}
+
+		//insert table rows and set ids and cell text
+		function insertSpot() {
+			var newRow = theBoard.insertRow(-1);
+			var numRows = theBoard.getElementsByTagName("tr").length-1;
+
+			cell10 = newRow.insertCell(-1);
+			text = "||------------||";
+			cell10.appendChild(document.createTextNode(text));
+			cell10.id = numRows;
+
+			cell11 = newRow.insertCell(-1);
+			text = "||------------||";
+			cell11.appendChild(document.createTextNode(text));
+			cell11.id = numRows + 22;
+
+			cell12 = newRow.insertCell(-1);
+			text = "||------------||";
+			cell12.appendChild(document.createTextNode(text));
+			cell12.id = numRows + 44;
+
+			cell13 = newRow.insertCell(-1);
+			text = "||------------||";
+			cell13.appendChild(document.createTextNode(text));
+			cell13.id = numRows + 66;
+
+			//make column headings
+			fscout = document.getElementById("0");
+			fpass = document.getElementById("22");
+			escout = document.getElementById("44");
+			epass = document.getElementById("66");
+			fscout.innerHTML = "Friendly" + "<br />" + "Scout";
+			fpass.innerHTML = "Friendly" + "<br />" + "Passenger";
+			escout.innerHTML = "Enemy" + "<br />" + "Scout";
+			epass.innerHTML = "Enemy" + "<br />" + "Passenger";
+		}
+
+		//create ship pieces and add click listeners
+		function moveShip(){
+			scout = document.getElementById(positions[0]);
+			pass = document.getElementById(positions[1]);
+			kioscout = document.getElementById(positions[2]);
+			kiopass = document.getElementById(positions[3]);
+			scout.innerHTML = "|| FS Ship ||";
+			pass.innerHTML = "|| FP Ship ||";
+			kioscout.innerHTML = "|| ES Ship ||";
+			kiopass.innerHTML = "|| EP Ship ||";
+
+			scout.addEventListener("click", scoutmove, false);
+			pass.addEventListener("click", passmove, false);
+		}
+
+		//remove ability to click after a ship has been clicked
+		function removeclicks(){
+			removeclickpass = document.getElementById(positions[1]);
+			removeclickpass.removeEventListener("click", passmove, false);
+			removeclickscout = document.getElementById(positions[0]);
+			removeclickscout.removeEventListener("click", scoutmove, false);
+		}
+
+		//move friendly scout piece
+		function scoutmove(){
+			moveNum = rollDice(1,6);
+			removeclicks();
+			this.innerHTML = "||------------||";
+			newid = parseInt(this.id) + moveNum;
+			//prevent piece from being moved past finish line
+			if(newid >= 21){
+				newid = 21;
+				finmsg.innerHTML = "Friendly Scout has reached the finish line!";
+			}
+			newspot = document.getElementById(newid);
+			newspot.innerHTML = "|| FS Ship ||";
+			gamemsg.innerHTML = "You rolled a " + moveNum + "!";
+			positions[0] = newspot.id;
+			finished();
+			nonkiomove();
+		}
+
+		//move friendly passenger ship piece
+		function passmove(){
+			moveNum = rollDice(1,6);
+			removeclicks();
+			this.innerHTML = "||------------||";
+			newid = parseInt(this.id) + moveNum;
+			//prevent piece from being moved past finish line
+			if(newid >= 43){
+				newid = 43;
+				finmsg.innerHTML = "Friendly Passenger has reached the finish line!";
+			}
+			newspot = document.getElementById(newid);
+			newspot.innerHTML = "|| FP Ship ||";
+			gamemsg.innerHTML = "You rolled a " + moveNum + "!";
+			positions[1] = newspot.id;
+			finished();
+			nonkiomove();
+		}
+
+		//switch between scout to passenger for nonkio's turn
+		var switcher = true;
+		//determine if scout or passenger have made it to the finish line
+		//to keep nonkio from wasting turns on ships that have already finished
+		var nonscoutfin = false;
+		var nonpassfin = false;
+
+		//play for nonkio
+		function nonkiomove(){
+			moveNum = rollDice(1,6);
+			kioscout = document.getElementById(positions[2]);
+			kiopass = document.getElementById(positions[3]);
+			//play nonkio's scout
+			if(switcher == true){
+				kioscout.innerHTML = "||------------||"
+				newid = parseInt(kioscout.id) + moveNum;
+				//determine if nonkio's scout has reached the finish line
+				if(newid >= 65){
+					newid = 65;
+					nonkiomsg.innerHTML = "Nonkio's Scout has reached the finish line!";
+					nonscoutfin = true;
+				}
+				newspot = document.getElementById(newid);
+				newspot.innerHTML = "|| ES Ship ||";
+				//keep nonkio from wasting turns
+				if(nonpassfin == false){
+					switcher = false;
+				} else {
+					switcher = true;
+				}
+				positions[2] = newspot.id;
+				nonkiomsg.innerHTML = "Nonkio rolled a " + moveNum + " and moved his scout.";
+			//play nonkio's passenger ship
+			} else {
+				kiopass.innerHTML = "||------------||"
+				newid = parseInt(kiopass.id) + moveNum;
+				//determine if nonkio's passenger ship has reached the finish line
+				if(newid >= 87){
+					newid = 87;
+					nonkiomsg.innerHTML = "Nonkio's Passenger has reached the finish line!";
+					nonpassfin = true;
+				}
+			newspot = document.getElementById(newid);
+			newspot.innerHTML = "|| EP Ship ||";
+			//keep nonkio from wasting turns
+			if(nonscoutfin == false){
+				switcher = true;
+			} else {
+				switcher = false;
+			}
+				positions[3] = newspot.id;
+				nonkiomsg.innerHTML = "Nonkio rolled a " + moveNum + " and moved his passenger.";
+			}
+			//keep finished() function from being called twice which creates 2 consecutive alert boxes
+			//gamefinished will already be set to false by first finished call from
+			//either scoutmove or passmove functions that call nonkiomove
+			if (gamefinished == false){
+				finished();
+			}
+		}
+	</script>
+
+	<!-- Second control table to save trouble from scrolling to upper control
+	table on small screens
+	-->
+	<table id="control1">
+		<tr>
+			<td id="start"><button onclick="makeTable()">Restart</td>
+			<td id="move"><button onclick="moveShip()">Move</td>
+		</tr>
+	</table>
+
+	</body>
+</html>
