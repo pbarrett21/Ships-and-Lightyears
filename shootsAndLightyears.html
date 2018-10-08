@@ -56,7 +56,8 @@ http://pluspng.com/png-game-piece-9524.html
 		<p id=gamemsg>
 			Press start
 		</p>
-
+		<p id=nonkiogamemsg></p>
+		<p id=fingamemsg></p>
 		<!-- Note this is one table, you'll want TWO, one for each path -->
 		<table id="trouble">
 			<!--
@@ -71,30 +72,8 @@ http://pluspng.com/png-game-piece-9524.html
 
 		<script>
 		var theBoard = document.getElementById("trouble");
-
-		/*
-		var row1 = theBoard.insertRow(-1);
-
-		cell10 = row1.insertCell(-1);
-		text = "Row 1 Cell 0";
-		cell10.appendChild(document.createTextNode(text));
-		console.log("Here1");
-
-		cell11 = row1.insertCell(-1);
-		text = "Row 1 Cell 1";
-		cell11.appendChild(document.createTextNode(text));
-		console.log("Here2");
-
-		cell12 = row1.insertCell(-1);
-		text = "Row 1 Cell 2";
-		cell12.appendChild(document.createTextNode(text));
-		console.log("Here3");
-
-		cell13 = row1.insertCell(-1);
-		text = "Row 1 Cell 3";
-		cell13.appendChild(document.createTextNode(text));
-		console.log("Here4 ");
-		*/
+		var positions = [1, 23, 45, 67];
+		finished();
 
 		function IclickedHere() {
 			// "this" should be an object of what was clicked!
@@ -123,15 +102,14 @@ http://pluspng.com/png-game-piece-9524.html
 			startToggle = false;
 		}
 
-		/*function finished(){
-			if(positions[0] >= 21){
-				scoutfin = document.getElementById("21");
-				scoutfin.innerHTML = "FS Ship";
-				msg = document.getElementById("gamemsg");
-				msg.innerHTML = "Friendly Scout has reached the finish line, one to go!";
-
+		function finished(){
+			//finish spots are [21, 43, 65, 87]
+			if(positions[0] == 21 && positions[1] == 43){
+				window.alert("You won!\nKeep playing or press Start to restart.");
+			} else if (positions[2] == 65 && positions[3] == 87) {
+				window.alert("You lost!\nKeep playing or press Start to restart.");
 			}
-		}*/
+		}
 
 		function rollDice(begin, end){
 			return Math.floor(Math.random() * (end - begin + 1)) + begin;
@@ -143,21 +121,21 @@ http://pluspng.com/png-game-piece-9524.html
 			var numRows = theBoard.getElementsByTagName("tr").length-1; // rows start at 0
 
 			cell10 = newRow.insertCell(-1);
-			text = numRows;
+			text = "||------------||";
 			cell10.appendChild(document.createTextNode(text));
 			cell10.id = numRows;
 
 			//console.log("HereX :", cell10.id);
 
 			cell11 = newRow.insertCell(-1);
-			text = numRows + 22;
+			text = "||------------||";
 			cell11.appendChild(document.createTextNode(text));
 			cell11.id = numRows + 22;
 
 			//console.log("HereY :", cell11.id);
 
 			cell12 = newRow.insertCell(-1);
-			text = numRows + 44;
+			text = "||------------||";
 			cell12.appendChild(document.createTextNode(text));
 			cell12.id = numRows + 44;
 
@@ -165,18 +143,10 @@ http://pluspng.com/png-game-piece-9524.html
 
 			cell13 = newRow.insertCell(-1);
 			//text = "Row "+numRows+" Cell 3";
-			text = numRows + 66;
+			text = "||------------||";
 			cell13.appendChild(document.createTextNode(text));
 			cell13.id = numRows + 66;
 
-			//console.log("HereX :", cell10.id);
-
-			/*if (numRows == 5) {
-				// example event!
-				cell11.addEventListener("click", IclickedHere, false);
-				console.log("Debug: listener added!");
-			}
-			*/
 			w = document.getElementById("0");
 			x = document.getElementById("22");
 			y = document.getElementById("44");
@@ -185,32 +155,18 @@ http://pluspng.com/png-game-piece-9524.html
 			x.innerHTML = "Friendly" + "<br />" + "Passenger";
 			y.innerHTML = "Enemy" + "<br />" + "Scout";
 			z.innerHTML = "Enemy" + "<br />" + "Passenger";
-
-
-
-			//change text
-			//x = document.getElementById("newRow"+numRows+"1");
-			//x.innerHTML+=" - Rows: " + numRows;
-
 		}
-
-
-		var positions = [1, 23, 45, 67];
 
 		function moveShip(){
 			scout = document.getElementById(positions[0]);
 			pass = document.getElementById(positions[1]);
 			y1 = document.getElementById(positions[2]);
 			z1 = document.getElementById(positions[3]);
-			scout.innerHTML = "FS Ship";
-			pass.innerHTML = "FP Ship";
-			y1.innerHTML = "ES Ship";
-			z1.innerHTML = "EP Ship";
+			scout.innerHTML = "|| FS Ship ||";
+			pass.innerHTML = "|| FP Ship ||";
+			y1.innerHTML = "|| ES Ship ||";
+			z1.innerHTML = "|| EP Ship ||";
 
-			moveNum = rollDice(1,6);
-			//call listenClickMove
-			//capture return cell vals
-			//do nonkios turn
 			scout.addEventListener("click", scoutmove, false);
 			pass.addEventListener("click", passmove, false);
 		}
@@ -221,14 +177,14 @@ http://pluspng.com/png-game-piece-9524.html
 			removeclickpass.removeEventListener("click", passmove, false);
 			removeclickscout = document.getElementById(positions[0]);
 			removeclickscout.removeEventListener("click", scoutmove, false);
-			this.innerHTML = "";
+			this.innerHTML = "||------------||";
 			newid = parseInt(this.id) + moveNum;
-			if(newid > 21){
+			if(newid >= 21){
 				newid = 21;
-				msg = document.getElementById("gamemsg");
+				msg = document.getElementById("fingamemsg");
 				msg.innerHTML = "Friendly Scout has reached the finish line!";
 			}
-			newspot = document.getElementById(parseInt(this.id) + moveNum);
+			newspot = document.getElementById(newid);
 			newspot.innerHTML = "|| FS Ship ||";
 			msg = document.getElementById("gamemsg");
 			msg.innerHTML = "You rolled a " + moveNum + "!";
@@ -243,9 +199,15 @@ http://pluspng.com/png-game-piece-9524.html
 			removeclickscout.removeEventListener("click", scoutmove, false);
 			removeclickpass = document.getElementById(positions[1]);
 			removeclickpass.removeEventListener("click", passmove, false);
-			this.innerHTML = "";
-			newspot = document.getElementById(parseInt(this.id) + moveNum);
-			newspot.innerHTML = "FP Ship";
+			this.innerHTML = "||------------||";
+			newid = parseInt(this.id) + moveNum;
+			if(newid >= 43){
+				newid = 43;
+				msg = document.getElementById("fingamemsg");
+				msg.innerHTML = "Friendly Passenger has reached the finish line!";
+			}
+			newspot = document.getElementById(newid);
+			newspot.innerHTML = "|| FP Ship ||";
 			msg = document.getElementById("gamemsg");
 			msg.innerHTML = "You rolled a " + moveNum + "!";
 			positions[1] = newspot.id;
@@ -253,51 +215,52 @@ http://pluspng.com/png-game-piece-9524.html
 		}
 
 		var switcher = 1;
+		var nonscoutfin = false;
+		var nonpassfin = false;
 
 		function nonkiomove(){
-			msg = document.getElementById("gamemsg");
-			msg.innerHTML = "Nonkio is making his move!";
-			setTimeout(function() {
+			msg = document.getElementById("nonkiogamemsg");
 				moveNum = rollDice(1,6);
 				kioscout = document.getElementById(positions[2]);
 				kiopass = document.getElementById(positions[3]);
 				if(switcher == 1){
-					kioscout.innerHTML = ""
-					newspot = document.getElementById(parseInt(kioscout.id) + moveNum);
-					newspot.innerHTML = "ES Ship";
-					switcher = 0;
+					kioscout.innerHTML = "||------------||"
+					newid = parseInt(kioscout.id) + moveNum;
+					if(newid >= 65){
+						newid = 65;
+						msg = document.getElementById("nonkiogamemsg");
+						msg.innerHTML = "Nonkio's Scout has reached the finish line!";
+						nonscoutfin = true;
+					}
+					newspot = document.getElementById(newid);
+					newspot.innerHTML = "|| ES Ship ||";
+					if(nonpassfin == false){
+						switcher = 0;
+					} else {
+						switcher = 1;
+					}
 					positions[2] = newspot.id;
+					msg.innerHTML = "Nonkio rolled a " + moveNum + " and moved his scout";
 				} else {
-					kiopass.innerHTML = ""
-					newspot = document.getElementById(parseInt(kiopass.id) + moveNum);
-					newspot.innerHTML = "EP Ship";
-					switcher = 1;
+					kiopass.innerHTML = "||------------||"
+					newid = parseInt(kiopass.id) + moveNum;
+					if(newid >= 87){
+						newid = 87;
+						msg = document.getElementById("nonkiogamemsg");
+						msg.innerHTML = "Nonkio's Passenger has reached the finish line!";
+						nonpassfin = true;
+					}
+					newspot = document.getElementById(newid);
+					newspot.innerHTML = "|| EP Ship ||";
+					if(nonscoutfin == false){
+						switcher = 1;
+					} else {
+						switcher = 0;
+					}
 					positions[3] = newspot.id;
+					msg.innerHTML = "Nonkio rolled a " + moveNum + " and moved his passenger";
 				}
-			}, 3000);
 		}
-
-		/*function passmove(cell1, cell2, moveNum){
-			scoutclick = document.getElementById(cell1);
-			passclick = document.getElementById(cell2);
-			//scoutclick.removeEventListener("click", scoutmove(cell1, cell2, moveNum), false);
-			//passclick.removeEventListener("click", passmove(cell1, cell2, moveNum), false);
-			passclick.innerHTML = "";
-			newspot = document.getElementById(cell2 + moveNum);
-			newspot.innerHTML = "FP Ship";
-
-		}*/
-
-		/*function listenClickMove(cell1, cell2, moveNum){
-			//add click listeners on cell1 and cell2
-			//once either is clicked iterate that column row by moveNum
-			//move the ship to new place
-			//remove listeners
-			//return new cell positions
-			//put cell positions in array positions
-			scoutclick = document.getElementById(cell1);
-			passclick = document.getElementById(cell2);
-		}*/
 
 	</script>
 
