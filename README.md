@@ -1,4 +1,5 @@
 # Ships and Lightyears
+temporarily at http://www.cs.uky.edu/~pba243/Project2/shipsAndLightyears.html
 
 Xelkalai has successfully implemented his travel agency
 thanks to your help. He is now faced with the problem
